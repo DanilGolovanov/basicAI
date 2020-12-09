@@ -43,7 +43,7 @@ public class WaypointAI : MonoBehaviour
         if (distance < minDistance)
         {
             Vector3 randomPosition = random;
-            randomPosition.Set(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10));
+            randomPosition.Set(Random.Range(0, 2), Random.Range(0, 1), Random.Range(0, 2));
             waypoint[index].transform.position = randomPosition;
             index++;     
         }

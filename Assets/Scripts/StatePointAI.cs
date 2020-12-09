@@ -75,25 +75,32 @@ public class StatePointAI : MonoBehaviour
     //While chasing the player AI also reduces player's health by attacking him
     private IEnumerator chaseState()
     {
-        Debug.Log("chase: Enter");
-        while (state == State.chase)
+        if (playerController.health >= 25)
         {
-            distanceBetweenPlayerAndAI = Vector2.Distance(transform.position, player.transform.position);
-            Debug.Log("Chasing");
-            yield return null;
-            //patrol if player is too far away
-            if (distanceBetweenPlayerAndAI >= maxDistanceAI)
+            Debug.Log("chase: Enter");
+            while (state == State.chase)
             {
-                state = State.patrol;
+                distanceBetweenPlayerAndAI = Vector2.Distance(transform.position, player.transform.position);
+                Debug.Log("Chasing");
+                yield return null;
+                //patrol if player is too far away
+                if (distanceBetweenPlayerAndAI >= maxDistanceAI)
+                {
+                    state = State.patrol;
+                }
+                //flee from the player if his health is less than 25
+                if (playerController.health < 25)
+                {
+                    state = State.flee;
+                }
+                Chase();
             }
-            //flee from the player if his health is less than 25
-            if (playerController.health < 25)
-            {
-                state = State.flee;
-            }
-            Chase();
+            Debug.Log("chase: Exit"); 
         }
-        Debug.Log("chase: Exit");
+        else
+        {
+            state = State.flee;
+        }
         NextState();
     }
 
@@ -107,7 +114,7 @@ public class StatePointAI : MonoBehaviour
             Debug.Log("Fleeing");
             yield return null;
             //patrol as soon as player is bit more far away than maxDistanceAI
-            if (distanceBetweenPlayerAndAI >= maxDistanceAI)
+            if (distanceBetweenPlayerAndAI >= maxDistanceAI + 10)
             {
                 speed = 5;
                 state = State.patrol;
@@ -132,8 +139,10 @@ public class StatePointAI : MonoBehaviour
     private void Flee()
     {
         //run away from the player
-        speed = 10;
-        Vector3 directionToFlee = Vector3.one * 10;
+        speed = 10; 
+        Vector3 directionToFlee = Vector2.MoveTowards(transform.position, 
+            new Vector2 (-player.transform.position.x, -player.transform.position.y),
+            speed * Time.deltaTime);
         MoveAI(directionToFlee);
         AttackPlayer();
     }
